@@ -1,0 +1,38 @@
+clean J0 by method: {'ernie': -10.95, 'm3ddpg': -11.13, 'maddpg': -11.12, 'mir3': -11.1, 'nr': -11.13, 'pr': -10.58}
+
+rho under no correction (mean over seeds):
+method                ernie  m3ddpg  maddpg   mir3     nr     pr
+kind strength scope                                             
+bias 0.7      all     0.930   0.928   0.936  0.924  0.944  0.955
+              worst1  0.973   0.968   0.972  0.968  0.974  0.980
+     0.9      all     0.874   0.871   0.875  0.869  0.901  0.908
+              worst1  0.951   0.945   0.952  0.942  0.957  0.960
+
+oracle gains:
+method kind  strength  scope  rho_none  gain_exact  lo_exact  hi_exact  gain_d1  gain_d3  gain_d10  clip_exact
+ ernie bias       0.7    all     0.930         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ ernie bias       0.7 worst1     0.973         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ ernie bias       0.9    all     0.874         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ ernie bias       0.9 worst1     0.951         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+m3ddpg bias       0.7    all     0.928         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+m3ddpg bias       0.7 worst1     0.968         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+m3ddpg bias       0.9    all     0.871         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+m3ddpg bias       0.9 worst1     0.945         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+maddpg bias       0.7    all     0.936       0.029     0.024     0.033    0.026    0.023     0.015       0.183
+maddpg bias       0.7 worst1     0.972       0.016     0.012     0.020    0.014    0.012     0.007       0.172
+maddpg bias       0.9    all     0.875       0.056     0.050     0.063    0.047    0.042     0.022       0.252
+maddpg bias       0.9 worst1     0.952       0.026     0.020     0.031    0.022    0.020     0.010       0.236
+  mir3 bias       0.7    all     0.924         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+  mir3 bias       0.7 worst1     0.968         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+  mir3 bias       0.9    all     0.869         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+  mir3 bias       0.9 worst1     0.942         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr bias       0.7    all     0.944         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr bias       0.7 worst1     0.974         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr bias       0.9    all     0.901         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr bias       0.9 worst1     0.957         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    pr bias       0.7    all     0.955       0.019     0.014     0.026    0.018    0.016     0.010       0.168
+    pr bias       0.7 worst1     0.980       0.011     0.007     0.014    0.010    0.007     0.005       0.155
+    pr bias       0.9    all     0.908       0.042     0.032     0.053    0.037    0.032     0.014       0.237
+    pr bias       0.9 worst1     0.960       0.019     0.015     0.023    0.016    0.015     0.006       0.230
+
+STOP RULE: max MADDPG exact-oracle gain on gain/bias cells = 0.056 (bias 0.9 all; threshold 0.05) -> GO
