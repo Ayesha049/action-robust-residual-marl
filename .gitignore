@@ -1,0 +1,4 @@
+# Paper PDFs (local only)
+**/papers/*.pdf
+# Server addresses (local only)
+servers.txt

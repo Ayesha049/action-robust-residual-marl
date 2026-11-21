@@ -1,0 +1,70 @@
+                   cell  maddpg    pr    nr  residual    ft
+          L-nr-all-a0.1   0.940 0.967 0.948     0.974 0.967
+          L-nr-all-a0.3   0.690 0.780 0.729     0.816 0.783
+          L-nr-one-a0.1   0.977 0.988 0.980     0.991 0.988
+          L-nr-one-a0.3   0.877 0.927 0.892     0.940 0.926
+          L-pr-all-a0.1   0.914 0.947 0.916     0.948 0.952
+          L-pr-all-a0.3   0.531 0.639 0.554     0.640 0.649
+          L-pr-one-a0.1   0.960 0.981 0.970     0.983 0.983
+          L-pr-one-a0.3   0.829 0.897 0.856     0.902 0.900
+            L-pr-one-a1   0.250 0.455 0.333     0.442 0.445
+          R-nr-all-a0.1   0.980 0.981 0.982     0.988 0.983
+          R-nr-all-a0.3   0.904 0.935 0.916     0.938 0.933
+          R-nr-all-a0.5   0.771 0.832 0.806     0.845 0.835
+       R-nr-worst1-a0.1   0.990 0.991 0.990     0.991 0.993
+       R-nr-worst1-a0.3   0.963 0.972 0.966     0.977 0.971
+       R-nr-worst1-a0.5   0.903 0.946 0.925     0.951 0.946
+          R-pr-all-a0.1   0.965 0.977 0.969     0.985 0.977
+          R-pr-all-a0.3   0.871 0.903 0.886     0.910 0.907
+          R-pr-all-a0.5   0.719 0.782 0.752     0.790 0.784
+       R-pr-worst1-a0.1   0.984 0.990 0.984     0.992 0.990
+       R-pr-worst1-a0.3   0.948 0.963 0.954     0.966 0.964
+       R-pr-worst1-a0.5   0.883 0.923 0.908     0.928 0.924
+    Rphi0.9-nr-all-a0.1   0.979 0.984 0.977     0.991 0.982
+    Rphi0.9-nr-all-a0.3   0.904 0.921 0.914     0.926 0.921
+    Rphi0.9-nr-all-a0.5   0.722 0.791 0.762     0.816 0.795
+ Rphi0.9-nr-worst1-a0.1   0.988 0.992 0.990     0.993 0.992
+ Rphi0.9-nr-worst1-a0.3   0.960 0.971 0.968     0.973 0.970
+ Rphi0.9-nr-worst1-a0.5   0.891 0.922 0.910     0.929 0.923
+    Rphi0.9-pr-all-a0.1   0.966 0.978 0.966     0.983 0.981
+    Rphi0.9-pr-all-a0.3   0.853 0.889 0.867     0.893 0.890
+    Rphi0.9-pr-all-a0.5   0.621 0.694 0.640     0.697 0.697
+ Rphi0.9-pr-worst1-a0.1   0.982 0.988 0.985     0.989 0.989
+ Rphi0.9-pr-worst1-a0.3   0.940 0.959 0.949     0.963 0.959
+ Rphi0.9-pr-worst1-a0.5   0.850 0.889 0.866     0.891 0.890
+   Rphi0.99-nr-all-a0.1   0.975 0.981 0.976     0.985 0.984
+   Rphi0.99-nr-all-a0.3   0.881 0.918 0.901     0.927 0.916
+   Rphi0.99-nr-all-a0.5   0.680 0.747 0.716     0.777 0.747
+Rphi0.99-nr-worst1-a0.1   0.987 0.989 0.990     0.990 0.991
+Rphi0.99-nr-worst1-a0.3   0.954 0.967 0.955     0.972 0.967
+Rphi0.99-nr-worst1-a0.5   0.860 0.909 0.890     0.923 0.905
+   Rphi0.99-pr-all-a0.1   0.960 0.971 0.966     0.976 0.973
+   Rphi0.99-pr-all-a0.3   0.809 0.862 0.828     0.869 0.864
+   Rphi0.99-pr-all-a0.5   0.568 0.626 0.583     0.628 0.628
+Rphi0.99-pr-worst1-a0.1   0.984 0.985 0.982     0.985 0.986
+Rphi0.99-pr-worst1-a0.3   0.929 0.949 0.932     0.949 0.947
+Rphi0.99-pr-worst1-a0.5   0.829 0.872 0.847     0.873 0.874
+
+clean return: {'ft': -10.464, 'maddpg': -11.54, 'nr': -10.937, 'pr': -10.563, 'residual': -10.589}
+
+== residual: outcome No
+T1 L-NR all 0.3: vs PR +0.0359 [+0.0217, +0.0478] better; vs NR +0.0868 [+0.0506, +0.1229] better -> pass
+T2 NR cells: better 10, worse 0, missing 0 of 22 -> fail
+T3 slope +0.0043 [-0.0019, +0.0095]; diffs +0.0044, +0.0050, +0.0110 -> fail
+T4 PR cells: 22 of 23 pass; fail: ['L-pr-one-a1'] -> fail
+T5 clean return vs PR: -0.0254 [-0.0488, -0.0019] worse -> pass
+
+== ft: outcome No
+T1 L-NR all 0.3: vs PR +0.0032 [-0.0043, +0.0108] unclear; vs NR +0.0541 [+0.0302, +0.0780] better -> fail
+T2 NR cells: better 0, worse 1, missing 0 of 22 -> fail
+T3 slope +0.0000 [+0.0000, +0.0000]; diffs +0.0000, +0.0000, +0.0000 -> fail
+T4 PR cells: 23 of 23 pass; fail: [] -> pass
+T5 clean return vs PR: +0.0991 [+0.0293, +0.2141] better -> pass
+
+T6 attribution, mean over NR cells (paired by seed):
+  residual - ft: +0.0088 [+0.0024, +0.0160] better
+  rec - ft: missing
+  residual - rec: missing
+  residual - resmlp: missing
+  rcfast - residual: missing
+  rcfast - ft: missing

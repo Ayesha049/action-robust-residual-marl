@@ -1,0 +1,4 @@
+for phase 1,
+
+I have an initial documentation for resudual network for action robust MARL.
+I want to verify if the framework has potential to outperform the phase 0 results. 
