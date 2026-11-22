@@ -625,6 +625,60 @@ the least-squares slope of δ on the oracle correction (1 = full correction).
 - **Runs and evaluation:** as in run 2 (tag and spread, seeds 0-4, every Stage 0 cell), output
   in `runs_phase2/stage1_run3/`, plus the correction diagnostic on tag and spread.
 
+### Stage 1 development run 3: results (2026-11-22, 19:57-20:39 on server A)
+
+Files are in `results/stage1_run3/` (summaries, diagnostics, per-cell CSVs, gzipped evaluation
+rows). All 40 runs and 280 evaluation jobs completed with no errors. Values are paired over seeds
+0-4, with 95% bootstrap CIs.
+
+**RC − MADDPG on rotation:**
+
+| Cell | tag | spread |
+| --- | --- | --- |
+| 60°, all | +0.45 [0.44, 0.47] | +0.14 [0.12, 0.17] |
+| 90°, all | +0.73 [0.71, 0.74] | +0.75 [0.72, 0.78] |
+| 180°, all | +0.61 [0.58, 0.64] | +2.96 [2.90, 3.03] |
+| 90°, worst single | +0.60 [0.53, 0.67] | +0.24 [0.23, 0.26] |
+| 180°, worst single | +0.56 [0.49, 0.64] | +0.46 [0.42, 0.50] |
+
+- **Absolute ρ, tag at 90° on all agents:** MADDPG 0.09, RC 0.82. For comparison, the exact
+  oracle gives 1.00 and the one-step-delayed d1 oracle 0.88. RC is close to the best any
+  causal corrector can do.
+- **Mechanism.** The diagnostic (base seed 0, 90°, all agents) shows RC's correction aligned
+  with the oracle's from the first step after onset: tag cos 0.99, k_fit 0.94 at k = 1, then
+  0.98-0.99. Spread: cos 0.89-0.95, k_fit 0.86-0.96. No false corrections before the onset
+  (‖δ‖ ≤ 0.04).
+- **The evidence input is causal.** RC − RC-blind at 90°, all agents, is +0.38 [0.36, 0.41] on
+  tag and +0.12 [0.10, 0.14] on spread.
+- **No-harm holds closely.** Clean: tag −0.010 [−0.025, 0.006], spread +0.002. Bias 0.9 on all
+  agents: tag −0.018 [−0.036, −0.003], spread −0.011 [−0.017, −0.003]. Run 2's −0.19 harm on
+  spread is gone. Gain, drift and stuck: within ±0.03.
+- **RC ≈ REC on both tasks** (rotation cells within ±0.03; most CIs include 0). The frozen-base
+  split still adds nothing measurable, so F3 would fail and the expected outcome is "without
+  split".
+- **FT gains almost nothing, even with the same tracking teacher.** RC − FT at 90°, all agents,
+  is +0.73 [0.72, 0.75] on tag (FT 0.08, the same as MADDPG) and +0.62 [0.58, 0.66] on spread.
+  At 180° it is +0.61 on tag and +1.99 on spread. Without memory and evidence inputs, the
+  teacher's target cannot be inferred.
+
+### Stage 2 pre-registration drafted (2026-11-22)
+
+`phase-2/PREREG-STAGE2.md` is the confirmation plan for the MADDPG arm (spread and tag, seeds
+5-9). The user approved it as written on 2026-11-22. The code is frozen at `01d0f21` (pushed so the
+pre-registration can cite it).
+- The F1-F7 test script was dry-run on the development data (run 3, seeds 0-4): both tasks
+  come out "Without split" (§6 of the pre-registration).
+- Held-out bases: spread seeds 5-9 come from Phase 1, copied to server A `runs_heldout/`. Tag
+  seeds 5-9 are being trained there with the Phase 0 settings.
+
+### Transport MAPPO bases (finished 2026-11-22 20:07, server B)
+
+Ten bases (seeds 0-9, fast_ent, 24M frames on transport_m10). Their clean evaluations are in
+`results/transport_bases/`.
+- Clean return 77.8-81.8 (mean 80.9). Delivered in 81-88% of episodes. The scripted pusher
+  scores 46.9 and 43%.
+- Every base passes the gate individually.
+
 ### Stage 3: VMAS Transport (about 2 weeks)
 
 - **Port:** move the Phase 0 MADDPG code to VMAS Transport (roughly 3-5 days). Check the port on
