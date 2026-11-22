@@ -679,6 +679,23 @@ Ten bases (seeds 0-9, fast_ent, 24M frames on transport_m10). Their clean evalua
   scores 46.9 and 43%.
 - Every base passes the gate individually.
 
+### Stage 0 on Transport (setup fixed before the run, 2026-11-22)
+
+- **Teams:** the MAPPO bases on transport_m10, seeds 0-4 (development), deterministic mean
+  policy. Every oracle predictor is used (none, exact, d1, d3, d10).
+- **Cells:** as on MPE, with 4 agents: clean; gain {0.7, 0.5, 0.3}; bias {0.1, 0.3, 0.5, 0.7,
+  0.9}; drift {0.01, 0.02, 0.04}; stuck; worst-direction bias 0.3; rotation {30, 60, 90, 180}°.
+  Single agent and all agents, as before. 100 episodes per cell, 300 steps each.
+- **Onset:** U{0..144}, chosen by the user. It keeps the MPE relative window (the first half of
+  the episode), so faults also hit in mid-push. It is implemented per task
+  (`phase2/faults.py` ONSET_BY_TASK). MPE stays U{0..12}, so the frozen Stage 2 behaviour is
+  unchanged. Server A keeps the frozen copy, and Transport runs only on server B.
+- **Scale:** J_rand = 0.00 (random team on the evaluation seeds).
+- **Stop rule (the same form as MPE, rotation headline):** GO if the exact oracle on MAPPO gains
+  at least 0.05 ρ in some rotation cell. Gain and bias are reported as before.
+- **Smoke test:** with the exact oracle under rotation 90° the episode return equals the clean
+  return exactly (101.6671 on base seed 0, episode 0).
+
 ### Stage 3: VMAS Transport (about 2 weeks)
 
 - **Port:** move the Phase 0 MADDPG code to VMAS Transport (roughly 3-5 days). Check the port on
