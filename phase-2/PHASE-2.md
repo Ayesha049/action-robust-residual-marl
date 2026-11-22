@@ -543,6 +543,88 @@ MADDPG at mass 50 too).
 - **Runs and evaluation:** as in run 1 (tag and spread, seeds 0-4, 4 kinds, every Stage 0
   cell), output in `runs_phase2/stage1_run2/`.
 
+### Stage 1 development run 2: results (2026-11-22, 18:50-19:32 on server A)
+
+Files are in `results/stage1_run2/` (summaries, per-cell CSVs and gzipped evaluation rows). Run
+1's are in `results/stage1_run1/`. All 40 runs and 280 evaluation jobs completed with no errors.
+Differences below are paired per seed (5 seeds), with 95% bootstrap CIs.
+
+**Spread: RC works, and it uses the evidence.**
+
+| Cell | MADDPG | RC | REC | RC-blind | FT | RC − MADDPG | RC − REC | RC − blind |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| rot 60°, all | 0.83 | 0.94 | 0.91 | 0.86 | 0.85 | +0.10 [0.07, 0.14] | +0.02 [0.01, 0.04] | +0.07 [0.05, 0.10] |
+| rot 90°, all | 0.22 | 0.80 | 0.84 | 0.70 | 0.34 | +0.58 [0.53, 0.64] | −0.04 [−0.06, −0.01] | +0.11 [0.08, 0.14] |
+| rot 180°, all | −2.04 | 0.82 | 0.84 | 0.48 | −1.43 | +2.85 [2.80, 2.91] | −0.02 [−0.04, 0.00] | +0.33 [0.30, 0.37] |
+| rot 90°, worst single | 0.75 | 0.94 | 0.94 | 0.89 | 0.78 | +0.20 [0.18, 0.21] | +0.00 | +0.06 [0.05, 0.06] |
+| rot 180°, worst single | 0.51 | 0.94 | 0.95 | 0.82 | 0.57 | +0.42 [0.38, 0.47] | −0.01 | +0.12 [0.11, 0.13] |
+| clean | 1.000 | 1.004 | 1.006 | 0.998 | 0.991 | +0.004 [0.002, 0.006] | | |
+| bias 0.9, all | 0.875 | 0.68 | 0.72 | 0.69 | 0.84 | **−0.19 [−0.26, −0.13]** | −0.04 | −0.01 |
+
+- At 90° and 180°, RC recovers 75-100% of the exact oracle's headroom (oracle +0.78 at 90°
+  and +3.04 at 180°, all agents). It also beats the d10 oracle (+0.31 and +1.41), so RC
+  identifies the rotation within a few steps.
+- **The evidence input is causal for the gain.** RC-blind keeps only part of it: 0.70 vs 0.80 at
+  90°, and 0.48 vs 0.82 at 180°.
+- **RC ≈ REC** (within ±0.04; REC is marginally ahead at 90°, all agents). As in Phase 1, the
+  frozen-base split itself adds nothing measurable. F3 would fail.
+- **One harm cell:** a large bias (0.9, all agents) costs RC 0.19, and REC and RC-blind lose
+  about the same. FT does not. Gain, bias ≤ 0.5 and drift are neutral to slightly positive
+  (≤ +0.02), and the stuck actuator is unchanged.
+
+**Tag: still no gain.** RC − MADDPG on rotation is between −0.00 and +0.03 (for example 90°, all
+agents: +0.013 [0.000, 0.025]). REC, RC-blind and FT are the same. Faults that cut authority
+lose up to 0.06 (gain 0.7 all: −0.06; bias 0.9 all: −0.05). Clean is −0.01.
+- The residual now moves: its norm under faults is about 0.25, against about 0.05 in run 1.
+  The training return on rotation episodes stays flat at about 7-8 from the first evaluation
+  on. Learning, not expressivity, is now the bottleneck on tag. This fits the Stage 0 finding
+  that a correction is worth something only if it lands within 1-3 steps of onset (the d10
+  oracle kept ≤ 0.08).
+
+### Diagnostic: is RC's correction aligned with the oracle's? (`phase2/diag_correction.py`)
+
+RC from run 2, base seed 0, rot 90° on all agents, 100 evaluation episodes. Per step k after the
+onset, δ = a_RC − μ_b is compared with the oracle correction clip(R⁻¹ μ_b) − μ_b. k_fit is
+the least-squares slope of δ on the oracle correction (1 = full correction).
+
+| k | spread cos | spread k_fit | spread ‖δ‖ | tag cos | tag k_fit | tag ‖δ‖ |
+| --- | --- | --- | --- | --- | --- | --- |
+| < 0 (before onset) | - | 0.00 | 0.02 | - | 0.00 | 0.06 |
+| 0 | −0.03 | 0.00 | 0.02 | −0.16 | 0.00 | 0.06 |
+| 1 | 0.76 | 0.64 | 0.91 | 0.15 | 0.05 | 0.26 |
+| 3 | 0.79 | 0.69 | 1.15 | 0.17 | 0.20 | 0.71 |
+| 6 | 0.74 | 0.64 | 1.15 | 0.23 | 0.23 | 1.00 |
+| 12 | 0.74 | 0.63 | 1.18 | 0.13 | 0.19 | 1.03 |
+
+- **Spread:** RC identifies the fault in **one step**, which is the earliest possible since the
+  first corrupted executed action is seen at k = 1. Its correction is well aligned (cos about
+  0.75) and about two-thirds of the oracle's size.
+- **Tag:** RC *detects* the fault (‖δ‖ rises from 0.06 to about 1.0 within 5 steps) but
+  corrects in **the wrong direction** (cos 0.13-0.23, k_fit ≤ 0.23). Detection comes from the
+  evidence input. The direction of the correction must come from the critic's action
+  gradient, and on tag (sparse catch rewards, saturated actions) that gradient carries little
+  information about which command is good under a given fault.
+- Neither task shows false corrections before the onset (‖δ‖ ≤ 0.06).
+
+### Stage 1 development run 3: intent-tracking loss (decided by the user 2026-11-22)
+
+- **Change (the only one from run 2):** the actor objective gains a training-only term,
+  λ_track ‖clip(M_t a + b_t) − μ_b‖², with λ_track = 1, on every step of every episode
+  (`--track 1`).
+  - The executed action should match what the base intended. It uses the privileged fault
+    parameters (M_t, b_t) that the critic already receives, so execution is unchanged.
+  - Before the onset and on clean episodes it reduces to ‖a − μ_b‖², which discourages false
+    corrections.
+- **Purpose:** supply the direction of the correction that tag's critic gradient fails to give
+  (see the diagnostic), and remove the over-correction harm on spread (bias 0.9, all agents).
+- **The same term goes to every kind** (RC, RC-blind, REC, FT), so the controls share the
+  objective.
+- **Caveat, stated as part of the method:** the term builds the oracle's target into training.
+  The claim becomes "a corrector trained with a privileged intent-tracking teacher, executing on
+  self-sensed evidence only".
+- **Runs and evaluation:** as in run 2 (tag and spread, seeds 0-4, every Stage 0 cell), output
+  in `runs_phase2/stage1_run3/`, plus the correction diagnostic on tag and spread.
+
 ### Stage 3: VMAS Transport (about 2 weeks)
 
 - **Port:** move the Phase 0 MADDPG code to VMAS Transport (roughly 3-5 days). Check the port on

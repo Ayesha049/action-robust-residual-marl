@@ -1,0 +1,197 @@
+== tag: rho on the base scale (mean over 5 seeds)
+ kind  strength  scope  maddpg  residual   rec  blind    ft
+ bias      0.10    all   0.937     0.939 0.943  0.929 0.966
+ bias      0.10 worst1   0.951     0.959 0.955  0.935 0.982
+ bias      0.30    all   0.817     0.803 0.818  0.814 0.849
+ bias      0.30 worst1   0.859     0.853 0.864  0.847 0.876
+ bias      0.50    all   0.661     0.610 0.615  0.641 0.674
+ bias      0.50 worst1   0.732     0.725 0.738  0.725 0.778
+ bias      0.70    all   0.512     0.451 0.456  0.497 0.514
+ bias      0.70 worst1   0.615     0.601 0.598  0.630 0.645
+ bias      0.90    all   0.377     0.327 0.349  0.386 0.388
+ bias      0.90 worst1   0.535     0.511 0.521  0.541 0.560
+clean      0.00  clean   1.000     0.989 0.991  0.973 1.019
+drift      0.01 worst1   0.951     0.960 0.968  0.962 0.991
+drift      0.02 worst1   0.919     0.935 0.926  0.926 0.953
+drift      0.04 worst1   0.834     0.827 0.836  0.813 0.846
+ gain      0.30    all   0.102     0.094 0.094  0.102 0.104
+ gain      0.30 worst1   0.328     0.309 0.311  0.325 0.338
+ gain      0.50    all   0.209     0.169 0.175  0.216 0.208
+ gain      0.50 worst1   0.413     0.383 0.387  0.406 0.401
+ gain      0.70    all   0.508     0.447 0.462  0.486 0.506
+ gain      0.70 worst1   0.627     0.596 0.612  0.607 0.649
+  rot     30.00    all   0.453     0.480 0.449  0.452 0.445
+  rot     30.00 worst1   0.599     0.610 0.625  0.571 0.573
+  rot     60.00    all   0.160     0.178 0.175  0.145 0.153
+  rot     60.00 worst1   0.378     0.403 0.394  0.362 0.371
+  rot     90.00    all   0.089     0.102 0.107  0.089 0.087
+  rot     90.00 worst1   0.292     0.304 0.310  0.278 0.296
+  rot    180.00    all   0.051     0.052 0.055  0.049 0.055
+  rot    180.00 worst1   0.233     0.233 0.239  0.236 0.226
+stuck      1.00 worst1   0.274     0.262 0.275  0.271 0.272
+ wdir      0.30   wdir   0.831     0.870 0.833  0.852 0.880
+
+== tag: residual-maddpg (mean, 95% bootstrap CI over seeds)
+ kind  strength  scope  residual-maddpg  residual-maddpg_lo  residual-maddpg_hi
+ bias      0.10    all            0.002              -0.013               0.020
+ bias      0.10 worst1            0.008              -0.012               0.029
+ bias      0.30    all           -0.015              -0.028              -0.001
+ bias      0.30 worst1           -0.006              -0.033               0.026
+ bias      0.50    all           -0.051              -0.085              -0.018
+ bias      0.50 worst1           -0.007              -0.050               0.031
+ bias      0.70    all           -0.061              -0.083              -0.040
+ bias      0.70 worst1           -0.015              -0.039               0.009
+ bias      0.90    all           -0.051              -0.072              -0.025
+ bias      0.90 worst1           -0.024              -0.079               0.025
+clean      0.00  clean           -0.011              -0.023               0.007
+drift      0.01 worst1            0.008              -0.021               0.029
+drift      0.02 worst1            0.016              -0.012               0.044
+drift      0.04 worst1           -0.007              -0.037               0.029
+ gain      0.30    all           -0.007              -0.017               0.005
+ gain      0.30 worst1           -0.019              -0.035              -0.003
+ gain      0.50    all           -0.039              -0.053              -0.031
+ gain      0.50 worst1           -0.031              -0.040              -0.021
+ gain      0.70    all           -0.061              -0.076              -0.045
+ gain      0.70 worst1           -0.032              -0.056              -0.017
+  rot     30.00    all            0.027              -0.010               0.064
+  rot     30.00 worst1            0.010              -0.039               0.060
+  rot     60.00    all            0.018               0.003               0.038
+  rot     60.00 worst1            0.025              -0.011               0.055
+  rot     90.00    all            0.013               0.000               0.025
+  rot     90.00 worst1            0.012              -0.013               0.036
+  rot    180.00    all            0.002              -0.007               0.010
+  rot    180.00 worst1           -0.000              -0.021               0.020
+stuck      1.00 worst1           -0.012              -0.020              -0.006
+ wdir      0.30   wdir            0.039               0.015               0.066
+
+== tag: residual-rec (mean, 95% bootstrap CI over seeds)
+ kind  strength  scope  residual-rec  residual-rec_lo  residual-rec_hi
+ bias      0.10    all        -0.004           -0.026            0.015
+ bias      0.10 worst1         0.004           -0.021            0.025
+ bias      0.30    all        -0.016           -0.060            0.028
+ bias      0.30 worst1        -0.011           -0.054            0.033
+ bias      0.50    all        -0.006           -0.043            0.030
+ bias      0.50 worst1        -0.013           -0.031            0.005
+ bias      0.70    all        -0.004           -0.029            0.018
+ bias      0.70 worst1         0.003           -0.024            0.023
+ bias      0.90    all        -0.022           -0.042           -0.000
+ bias      0.90 worst1        -0.009           -0.030            0.011
+clean      0.00  clean        -0.002           -0.017            0.016
+drift      0.01 worst1        -0.008           -0.027            0.011
+drift      0.02 worst1         0.009           -0.009            0.027
+drift      0.04 worst1        -0.008           -0.029            0.012
+ gain      0.30    all         0.001           -0.015            0.010
+ gain      0.30 worst1        -0.002           -0.017            0.013
+ gain      0.50    all        -0.006           -0.014            0.004
+ gain      0.50 worst1        -0.005           -0.021            0.014
+ gain      0.70    all        -0.015           -0.049            0.020
+ gain      0.70 worst1        -0.016           -0.037            0.003
+  rot     30.00    all         0.031            0.018            0.041
+  rot     30.00 worst1        -0.015           -0.053            0.029
+  rot     60.00    all         0.003           -0.012            0.019
+  rot     60.00 worst1         0.009           -0.027            0.047
+  rot     90.00    all        -0.004           -0.015            0.006
+  rot     90.00 worst1        -0.006           -0.026            0.012
+  rot    180.00    all        -0.003           -0.014            0.009
+  rot    180.00 worst1        -0.006           -0.039            0.023
+stuck      1.00 worst1        -0.013           -0.037            0.011
+ wdir      0.30   wdir         0.038           -0.004            0.088
+
+== tag: residual-blind (mean, 95% bootstrap CI over seeds)
+ kind  strength  scope  residual-blind  residual-blind_lo  residual-blind_hi
+ bias      0.10    all           0.010             -0.008              0.027
+ bias      0.10 worst1           0.024              0.011              0.038
+ bias      0.30    all          -0.011             -0.040              0.013
+ bias      0.30 worst1           0.006             -0.025              0.037
+ bias      0.50    all          -0.032             -0.090              0.023
+ bias      0.50 worst1          -0.000             -0.037              0.031
+ bias      0.70    all          -0.046             -0.071             -0.022
+ bias      0.70 worst1          -0.030             -0.053             -0.005
+ bias      0.90    all          -0.060             -0.085             -0.039
+ bias      0.90 worst1          -0.030             -0.045             -0.010
+clean      0.00  clean           0.016             -0.006              0.037
+drift      0.01 worst1          -0.002             -0.027              0.016
+drift      0.02 worst1           0.009             -0.016              0.034
+drift      0.04 worst1           0.014             -0.007              0.036
+ gain      0.30    all          -0.008             -0.023              0.008
+ gain      0.30 worst1          -0.016             -0.031              0.010
+ gain      0.50    all          -0.047             -0.061             -0.034
+ gain      0.50 worst1          -0.023             -0.040             -0.011
+ gain      0.70    all          -0.039             -0.048             -0.028
+ gain      0.70 worst1          -0.011             -0.055              0.029
+  rot     30.00    all           0.028             -0.014              0.069
+  rot     30.00 worst1           0.039             -0.016              0.087
+  rot     60.00    all           0.033              0.013              0.052
+  rot     60.00 worst1           0.041              0.004              0.072
+  rot     90.00    all           0.013              0.000              0.030
+  rot     90.00 worst1           0.026              0.002              0.051
+  rot    180.00    all           0.004             -0.002              0.011
+  rot    180.00 worst1          -0.003             -0.020              0.014
+stuck      1.00 worst1          -0.009             -0.013             -0.006
+ wdir      0.30   wdir           0.018             -0.027              0.045
+
+== tag: residual-ft (mean, 95% bootstrap CI over seeds)
+ kind  strength  scope  residual-ft  residual-ft_lo  residual-ft_hi
+ bias      0.10    all       -0.027          -0.051           0.006
+ bias      0.10 worst1       -0.023          -0.047           0.010
+ bias      0.30    all       -0.047          -0.082          -0.011
+ bias      0.30 worst1       -0.023          -0.053           0.007
+ bias      0.50    all       -0.064          -0.103          -0.027
+ bias      0.50 worst1       -0.053          -0.104          -0.002
+ bias      0.70    all       -0.063          -0.084          -0.042
+ bias      0.70 worst1       -0.044          -0.084          -0.015
+ bias      0.90    all       -0.061          -0.077          -0.045
+ bias      0.90 worst1       -0.048          -0.080          -0.018
+clean      0.00  clean       -0.030          -0.060          -0.001
+drift      0.01 worst1       -0.032          -0.066           0.010
+drift      0.02 worst1       -0.017          -0.045           0.010
+drift      0.04 worst1       -0.019          -0.041           0.008
+ gain      0.30    all       -0.010          -0.019          -0.002
+ gain      0.30 worst1       -0.029          -0.064           0.000
+ gain      0.50    all       -0.039          -0.047          -0.031
+ gain      0.50 worst1       -0.019          -0.033          -0.003
+ gain      0.70    all       -0.059          -0.075          -0.042
+ gain      0.70 worst1       -0.054          -0.065          -0.041
+  rot     30.00    all        0.035           0.001           0.072
+  rot     30.00 worst1        0.037           0.007           0.065
+  rot     60.00    all        0.025           0.010           0.042
+  rot     60.00 worst1        0.032           0.006           0.061
+  rot     90.00    all        0.015          -0.000           0.030
+  rot     90.00 worst1        0.008          -0.023           0.028
+  rot    180.00    all       -0.002          -0.009           0.003
+  rot    180.00 worst1        0.007          -0.008           0.022
+stuck      1.00 worst1       -0.010          -0.024           0.003
+ wdir      0.30   wdir       -0.010          -0.036           0.022
+
+== tag: rec-maddpg (mean, 95% bootstrap CI over seeds)
+ kind  strength  scope  rec-maddpg  rec-maddpg_lo  rec-maddpg_hi
+ bias      0.10    all       0.006         -0.025          0.038
+ bias      0.10 worst1       0.004         -0.032          0.040
+ bias      0.30    all       0.001         -0.044          0.044
+ bias      0.30 worst1       0.004         -0.052          0.050
+ bias      0.50    all      -0.046         -0.078         -0.015
+ bias      0.50 worst1       0.005         -0.047          0.040
+ bias      0.70    all      -0.057         -0.093         -0.032
+ bias      0.70 worst1      -0.017         -0.056          0.011
+ bias      0.90    all      -0.029         -0.054         -0.004
+ bias      0.90 worst1      -0.015         -0.079          0.029
+clean      0.00  clean      -0.009         -0.031          0.013
+drift      0.01 worst1       0.016         -0.004          0.043
+drift      0.02 worst1       0.007         -0.006          0.021
+drift      0.04 worst1       0.001         -0.019          0.022
+ gain      0.30    all      -0.008         -0.019          0.003
+ gain      0.30 worst1      -0.017         -0.023         -0.012
+ gain      0.50    all      -0.034         -0.043         -0.024
+ gain      0.50 worst1      -0.026         -0.036         -0.017
+ gain      0.70    all      -0.046         -0.071         -0.021
+ gain      0.70 worst1      -0.015         -0.056          0.017
+  rot     30.00    all      -0.004         -0.036          0.026
+  rot     30.00 worst1       0.025          0.001          0.060
+  rot     60.00    all       0.015         -0.002          0.032
+  rot     60.00 worst1       0.017         -0.029          0.062
+  rot     90.00    all       0.017          0.005          0.029
+  rot     90.00 worst1       0.018         -0.016          0.051
+  rot    180.00    all       0.004         -0.005          0.013
+  rot    180.00 worst1       0.006         -0.013          0.025
+stuck      1.00 worst1       0.000         -0.019          0.019
+ wdir      0.30   wdir       0.002         -0.063          0.049
