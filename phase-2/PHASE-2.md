@@ -238,6 +238,202 @@ section 4.
   - Gate as planned: package delivered in at least 80% of clean evaluation episodes
     (`phase2/eval_clean.py`).
 
+### Decision, 2026-11-21 ~22:00: Transport moves to a MAPPO base; MADDPG gets a second task
+
+- **Why:** at about 2.1M of 3M steps, all 6 runs of the gate pilot on server B were flat at a
+  return of about 0 from 0.5M steps on (the last 100 episodes averaged −0.01 to +0.06, against a
+  random team's 0.00). The 10M hedge on server A is left to finish as a data point only.
+- **Transport base:** MAPPO, our own minimal implementation in the repo (same env wrapper,
+  checkpoints and evaluation as MADDPG). It must reproduce the VMAS paper's Transport learning
+  before it is trusted. RC and REC wrap the MAPPO actor's mean action. The gate stays: package
+  delivered in at least 80% of clean episodes.
+- **MADDPG's second task:** screen MPE `tag` first, using the existing Phase 0 checkpoints. If
+  tag stops like spread did, move to VMAS `balance`.
+
+### Stage 0 on `tag` (setup fixed before the run, 2026-11-21)
+
+- **Teams:** the Phase 0 tag checkpoints, seeds 0-4. The team is 3 predators against the frozen
+  Phase 0 prey (`assets/tag_prey.pt`, the same md5 on server A and locally).
+  - Methods: MADDPG and PR-MADDPG with every predictor. NR and MARTA with no correction only.
+    MARTA is reported but excluded from conclusions, as on spread.
+- **Return scale:** J_rand = 1.05 (the Phase 0 value). A check on 100 episodes gave a random team
+  1.00 and MADDPG s0 J0 = 18.0, with sd 22.
+- **Episodes:** 500 per cell, not 100. Tag returns come in steps of 10 (catches), so 100 episodes
+  would give a ρ standard error of about 0.1 per team. Pairing on shared episode seeds reduces
+  this further.
+- **Cells:** as on spread, except bias also gets ‖b‖ 0.7 and 0.9, so the full response curve is
+  in the pre-set grid: gain {0.7, 0.5, 0.3}, bias {0.1, 0.3, 0.5, 0.7, 0.9}, drift {0.01, 0.02,
+  0.04}, stuck, wdir 0.3. Onset is U{0..12} (25-step episodes, as on spread).
+- **Stop rule (the same as spread):** stop the tag arm if the exact oracle on MADDPG gains less
+  than 0.05 ρ in every gain and bias cell. The paired bootstrap CI is reported next to each gain.
+- **Run:** lab server A, `TASK=tag STRENGTHS="bias=0.1,0.3,0.5,0.7,0.9" phase2/stage0.sh`, output
+  in `runs_phase2/stage0_tag/`.
+
+### Stage 0 on `tag` results (done 2026-11-21, 22:11-22:26 on server A): STOP
+
+Files are in `results/stage0_tag/`: the per-episode CSVs (gzipped), the summaries and
+`summary_printout.txt`. The 70 jobs ran with no errors. Clean J0: MADDPG 18.2, PR 18.1, NR 16.1,
+MARTA 10.8.
+
+- **Unlike spread, faults hurt a lot.** MADDPG ρ with no correction:
+
+  | Bias ‖b‖ (all / worst single agent) | 0.1 | 0.3 | 0.5 | 0.7 | 0.9 |
+  | --- | --- | --- | --- | --- | --- |
+  | all agents | 0.94 | 0.82 | 0.66 | 0.51 | 0.38 |
+  | worst single agent | 0.95 | 0.86 | 0.73 | 0.62 | 0.54 |
+
+  Gain g 0.7 / 0.5 / 0.3 on all agents gives ρ 0.51 / 0.21 / 0.10. A stuck single agent gives
+  0.27. Drift at η 0.04 gives 0.83.
+- **The oracle still recovers almost nothing.** The best MADDPG exact-oracle gain on a gain or
+  bias cell is +0.036 (bias 0.9, worst single agent; CI 0.019-0.052). The worst-direction
+  grid gives +0.041. **STOP for the tag arm by the pre-set rule.**
+- **Why: the predators run at full force.** The exact oracle has to clip 42% of corrected
+  components even at ‖b‖ 0.1, and 92-98% under gain faults. On spread these shares were 5% and
+  24-47%.
+  - Directly measured on clean episodes (50 per team): 78-86% of the tag predators' action
+    components have |a| > 0.95, and mean |a| is 0.92-0.95. On spread the shares are 15-18%, with
+    mean |a| 0.37-0.57.
+  - A chasing policy is bang-bang, so any loss of authority cannot be made up from within
+    [-1, 1]. This is P4's restorable-set limit, now binding in nearly every step.
+- **Summary of the two MPE tasks:** on spread, faults barely hurt (the agents re-steer from
+  positions). On tag, faults hurt, but the base already uses the whole actuator range. Neither
+  leaves room for a correction. Any task where a DDPG-style policy saturates (likely also
+  Balance and MuJoCo) will hit the tag problem.
+- **PR-MADDPG** is again no less fault-robust than MADDPG: ρ is within ±0.03 in most cells, and
+  its oracle gains are similar (≤ +0.046).
+
+### Decision, 2026-11-21 ~22:40: reserved actuator authority on `tag`
+
+Chosen by the user after the tag STOP above. The MADDPG Transport pilot is also final (3M steps,
+all 6 runs delivered in 0% of clean episodes), which confirms the MAPPO switch.
+
+- **Mechanism:** the base is trained with its actions scaled by c before the actuator
+  (`--act-cap c`, `marl/envs.py`). The actuator still accepts [-1, 1], so the base uses at most c
+  of the range and leaves 1 − c for the correction. This is the standard control-allocation
+  reserve of fault-tolerant control.
+  - `load_team` returns c·actor(o) in actuator units, so faults, the oracle and the clip share
+    are all measured against the full ±1 actuator.
+  - By P4: a bias ‖b‖ is restorable while c + |b_i| ≤ 1, and a gain g while c ≤ g.
+- **Setup fixed before the run:**
+  - c ∈ {0.5, 0.7}. MADDPG with the Phase 0 tag settings (1.5M steps, frozen Phase 0 prey).
+    Development seeds 0-4 only.
+  - Then the tag Stage 0 above, unchanged (the same grid, 500 episodes, the same stop rule), on
+    each cap.
+  - Also reported: the clean cost of the reserve, J0(cap) against the uncapped Phase 0 J0 of
+    18.2.
+  - The confirmation baseline must be the capped MADDPG base itself. That RC with a reserve
+    beats an uncapped MADDPG is a separate question, and it will be reported.
+- **Run:** lab server A, `phase2/tag_cap.sh`, output in `runs_phase2/tag_cap<c>/`.
+
+### Reserved authority on `tag`: results (2026-11-21, 22:40-23:14 on server A)
+
+Files are in `results/stage0_tagcap0.5/` and `results/stage0_tagcap0.7/` (the Stage 0 outputs and
+training logs), plus `results/tag_cap_vs_uncapped_returns.csv`.
+
+- **The cap costs most of the clean performance.** J0 is 2.12 at c 0.5 (close to random, 1.05)
+  and 8.22 at c 0.7, against 18.24 uncapped.
+  - The predators chase a full-authority prey, so in pursuit, actuator authority *is*
+    performance. ρ at c 0.5 is degenerate (J0 − J_rand ≈ 1), so c 0.5 is unusable.
+- **The headroom does open.** At c 0.7, the stop rule says GO. The exact-oracle gain is
+  +0.62 at gain 0.7 (all agents), +0.36 at bias 0.5 (all), and +0.39 on the worst-direction grid.
+  The d10 predictor recovers about a third of that (≤ +0.20).
+- **But the reserve is dominated.** In absolute return, the uncapped base with *no* correction
+  beats the c 0.7 base with the *exact* oracle in every cell:
+
+  | Cell | uncapped, no correction | c 0.7, exact oracle | c 0.7, d10 |
+  | --- | --- | --- | --- |
+  | bias 0.3, all | 15.1 | 8.2 | 7.0 |
+  | bias 0.9, all | 7.5 | 4.6 | 3.3 |
+  | gain 0.7, all | 9.8 | 8.2 | 5.2 |
+  | gain 0.5, all | 4.6 | 4.0 | 2.8 |
+  | worst direction 0.3 | 15.3 | 8.2 | 6.5 |
+
+- **Verdict:** a GO on paper, but not a usable arm. RC on a capped base could beat capped MADDPG
+  and REC, yet it would lose to plain uncapped MADDPG under every fault tested. That fails the
+  obvious reviewer comparison.
+
+### Decision, 2026-11-21 ~23:25: rotation faults on uncapped `tag` (setup fixed before the run)
+
+Chosen by the user after the reserve result above. This widens the threat model from gain, bias
+and drift to faults that turn the force rather than shrink it: a misaligned or mis-wired
+actuator.
+
+- **Fault:** `rot`, exe_j = clip(R(σ_j θ) cmd_j), with σ_j = ±1 drawn per episode and θ ∈ {30,
+  60, 90, 180}°. Victims are each single agent, and all agents. Onset is U{0..12}, as before.
+  The oracle command is clip(R(−σ_j θ) a*).
+  - 90° and 180° map the action box onto itself, so they are always exactly restorable
+    (unit-tested: zero restoration error and zero clipping).
+  - 30° and 60° lose only the part of a corner action that leaves the box. Uniform test
+    actions clip 7-8% of components.
+- **Teams:** the uncapped Phase 0 tag bases, seeds 0-4. MADDPG and PR-MADDPG with every
+  predictor, and NR with no correction. 500 episodes per cell.
+- **Stop rule:** GO for the tag arm if the exact oracle on MADDPG gains at least 0.05 ρ in some
+  `rot` cell. A cell where the d10 oracle also gains at least 0.05 marks it as reachable by a
+  causal corrector.
+- **Also run, exploratory:** the same rotation grid on spread (seeds 0-4, 100 episodes, MADDPG
+  and PR), for the self-correction story.
+- **Run:** lab server A. `KINDS="clean rot" RULE=rot phase2/stage0.sh` writes to
+  `runs_phase2/stage0_tagrot/` and `runs_phase2/stage0_spreadrot/`.
+
+### Rotation faults: results (2026-11-22, 00:07-00:30 on server A): GO on tag and on spread
+
+Files are in `results/stage0_tagrot/` and `results/stage0_spreadrot/`. All runs completed with
+no errors. Clean J0 reproduces exactly (MADDPG tag 18.24, spread −11.12).
+
+- **Rotation faults hurt, and no existing method resists them.** ρ with no correction:
+
+  | θ (all agents / worst single agent) | 30° | 60° | 90° | 180° |
+  | --- | --- | --- | --- | --- |
+  | tag, MADDPG | 0.45 / 0.60 | 0.16 / 0.38 | 0.09 / 0.29 | 0.05 / 0.23 |
+  | tag, PR-MADDPG | 0.48 / 0.58 | 0.17 / 0.34 | 0.10 / 0.27 | 0.05 / 0.19 |
+  | tag, NR-MADDPG | 0.51 / 0.62 | 0.17 / 0.36 | 0.10 / 0.28 | 0.05 / 0.20 |
+  | spread, MADDPG | 0.97 / 0.99 | 0.83 / 0.93 | 0.22 / 0.75 | −2.04 / 0.51 |
+
+  PR and NR training buy nothing against rotation (within ±0.06 of MADDPG).
+- **The oracle restores almost everything, at full authority.** Exact-oracle gains on MADDPG:
+
+  | Cell | tag exact | tag d1 / d3 / d10 | spread exact | spread d1 / d3 / d10 |
+  | --- | --- | --- | --- | --- |
+  | 30°, all | +0.18 | 0.19 / 0.16 / 0.06 | +0.01 | 0.01 / 0.01 / 0.00 |
+  | 60°, all | +0.48 | 0.43 / 0.33 / 0.07 | +0.15 | 0.14 / 0.12 / 0.05 |
+  | 90°, all | +0.91 | 0.79 / 0.49 / 0.06 | +0.78 | 0.76 / 0.69 / 0.31 |
+  | 180°, all | +0.95 | 0.71 / 0.29 / 0.00 | +3.04 | 2.99 / 2.82 / 1.41 |
+  | 90°, worst single | +0.71 | 0.66 / 0.44 / 0.08 | +0.25 | 0.24 / 0.22 / 0.09 |
+
+  - At 90° and 180° the clip share is 0. At 30° and 60° on tag it is about 0.46 (the
+    saturated corners), and the gains are still large.
+- **Detection speed is what matters on tag.** A pursuit is lost within a few steps, so d10 keeps
+  only ≤ 0.08 of the gain, while d1 keeps most of it. A corrector has to identify the
+  rotation within about 1-3 steps of onset, which is what executed-action evidence (ã_{t-1})
+  gives in principle. On spread, the slower task, d10 still keeps +0.31 at 90° and +1.41 at
+  180°.
+- **Verdict:** GO for both MADDPG arms by the pre-set rule. This is the first fault class with
+  large, restorable headroom on an uncapped base. Next is Stage 1 (development on seeds 0-4)
+  with rotation as the headline fault.
+
+### Transport gate check (2026-11-22): the 80%-delivery gate is infeasible at mass 50
+
+- **Idealised pusher:** agents start right behind the package and steer it straight at the goal.
+  At mass 50 it delivers in 0-1% of 100-step episodes, and in 7-12% even within 300-500 steps.
+  The package reaches about 0.007 units/s against a median start distance of about 1.0.
+  - Mass 10: 6% delivered within 100 steps, 38% within 300. Mass 5: 13% and 57%.
+- **Return ceiling at mass 50 and 100 steps:** a scripted walk-up pusher scores 2.6 (sd 3.5),
+  and 10.3 when it starts behind the package.
+- **MAPPO pilot:**
+  - Fast settings at 24M: clean return 0.24-0.59 and 0% delivered. The policy std collapsed to
+    about 0.05, so it has converged to a poor solution.
+  - Paper settings at about 9M of 24M: 0.23-0.32 and rising.
+  - Both are below the crude script, so the Transport arm needs a decision on the task setup
+    *and* on whether our MAPPO is good enough.
+
+### Decisions, 2026-11-22 (user)
+
+- **Rotation is the headline fault** on spread and tag. Gain, bias and drift are reported as the
+  authority-limited contrast, explained by P4. Stage 1 development (seeds 0-4) trains RC, REC
+  and FT on rotation faults.
+- **Transport:** a lighter package and a longer horizon (proposed: mass 10, 300 steps). Re-pilot
+  MAPPO there, with a gate relative to the scripted pusher's return.
+
 ### Stage 3: VMAS Transport (about 2 weeks)
 
 - **Port:** move the Phase 0 MADDPG code to VMAS Transport (roughly 3-5 days). Check the port on

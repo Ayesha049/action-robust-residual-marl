@@ -1,0 +1,35 @@
+clean-return reproduction: no Phase 1 Stage 0 CSVs in runs_phase1/stage0, skipped
+clean J0 by method: {'maddpg': -11.12, 'pr': -10.58}
+
+rho under no correction (mean over seeds):
+method                maddpg     pr
+kind strength scope                
+rot  30.0     all      0.972  0.980
+              worst1   0.987  0.991
+     60.0     all      0.831  0.844
+              worst1   0.928  0.942
+     90.0     all      0.221  0.224
+              worst1   0.746  0.762
+     180.0    all     -2.036 -1.947
+              worst1   0.512  0.611
+
+oracle gains:
+method kind  strength  scope  rho_none  gain_exact  lo_exact  hi_exact  gain_d1  gain_d3  gain_d10  clip_exact
+maddpg  rot      30.0    all     0.972       0.012     0.006     0.018    0.008    0.007     0.002       0.095
+maddpg  rot      30.0 worst1     0.987       0.005     0.000     0.010    0.006    0.005     0.001       0.092
+maddpg  rot      60.0    all     0.831       0.152     0.127     0.175    0.139    0.121     0.051       0.096
+maddpg  rot      60.0 worst1     0.928       0.064     0.053     0.077    0.059    0.047     0.023       0.093
+maddpg  rot      90.0    all     0.221       0.779     0.749     0.811    0.756    0.692     0.313       0.000
+maddpg  rot      90.0 worst1     0.746       0.254     0.239     0.270    0.243    0.221     0.087       0.000
+maddpg  rot     180.0    all    -2.036       3.036     2.983     3.104    2.989    2.816     1.413       0.000
+maddpg  rot     180.0 worst1     0.512       0.488     0.444     0.534    0.468    0.407     0.074       0.000
+    pr  rot      30.0    all     0.980       0.009     0.006     0.012    0.006    0.005     0.001       0.082
+    pr  rot      30.0 worst1     0.991       0.005     0.002     0.008    0.004    0.002    -0.000       0.093
+    pr  rot      60.0    all     0.844       0.146     0.131     0.162    0.134    0.119     0.054       0.083
+    pr  rot      60.0 worst1     0.942       0.056     0.049     0.064    0.050    0.042     0.019       0.091
+    pr  rot      90.0    all     0.224       0.776     0.740     0.812    0.759    0.706     0.345       0.000
+    pr  rot      90.0 worst1     0.762       0.238     0.230     0.246    0.232    0.215     0.095       0.000
+    pr  rot     180.0    all    -1.947       2.947     2.830     3.028    2.914    2.765     1.403       0.000
+    pr  rot     180.0 worst1     0.611       0.389     0.372     0.408    0.377    0.328     0.048       0.000
+
+STOP RULE (spread): max MADDPG exact-oracle gain on rot cells = 3.036 (rot 180.0 all; threshold 0.05) -> GO

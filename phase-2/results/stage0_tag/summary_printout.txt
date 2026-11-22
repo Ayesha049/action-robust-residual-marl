@@ -1,0 +1,116 @@
+clean-return reproduction: no Phase 1 Stage 0 CSVs in runs_phase1/stage0, skipped
+clean J0 by method: {'maddpg': 18.24, 'marta': 10.78, 'nr': 16.14, 'pr': 18.1}
+
+rho under no correction (mean over seeds):
+method                 maddpg  marta     nr     pr
+kind  strength scope                              
+bias  0.10     all      0.937  0.965  0.931  0.944
+               worst1   0.951  0.946  0.952  0.961
+      0.30     all      0.817  0.850  0.845  0.836
+               worst1   0.859  0.915  0.876  0.874
+      0.50     all      0.661  0.752  0.693  0.682
+               worst1   0.732  0.870  0.778  0.753
+      0.70     all      0.512  0.661  0.537  0.530
+               worst1   0.615  0.814  0.677  0.626
+      0.90     all      0.377  0.550  0.417  0.409
+               worst1   0.535  0.770  0.559  0.541
+drift 0.01     worst1   0.951  0.974  0.969  0.978
+      0.02     worst1   0.919  0.954  0.932  0.934
+      0.04     worst1   0.834  0.901  0.832  0.800
+gain  0.30     all      0.102  0.158  0.130  0.113
+               worst1   0.328  0.618  0.304  0.303
+      0.50     all      0.209  0.307  0.286  0.249
+               worst1   0.413  0.689  0.451  0.408
+      0.70     all      0.508  0.585  0.612  0.563
+               worst1   0.627  0.824  0.723  0.660
+stuck 1.00     worst1   0.274  0.539  0.254  0.230
+wdir  0.30     wdir     0.831  0.870  0.814  0.792
+
+oracle gains:
+method  kind  strength  scope  rho_none  gain_exact  lo_exact  hi_exact  gain_d1  gain_d3  gain_d10  clip_exact
+maddpg  bias      0.10    all     0.937      -0.004    -0.028     0.020   -0.006   -0.002    -0.004       0.417
+maddpg  bias      0.10 worst1     0.951       0.009    -0.003     0.020    0.001    0.008     0.002       0.418
+maddpg  bias      0.30    all     0.817       0.026    -0.002     0.048    0.019    0.007     0.005       0.459
+maddpg  bias      0.30 worst1     0.859       0.017     0.010     0.026    0.011    0.009     0.011       0.467
+maddpg  bias      0.50    all     0.661       0.029     0.012     0.049    0.020    0.017     0.016       0.489
+maddpg  bias      0.50 worst1     0.732       0.027     0.007     0.047    0.018    0.023     0.017       0.503
+maddpg  bias      0.70    all     0.512       0.020     0.008     0.036    0.016    0.026     0.010       0.521
+maddpg  bias      0.70 worst1     0.615       0.035     0.019     0.053    0.030    0.025     0.021       0.537
+maddpg  bias      0.90    all     0.377       0.023    -0.002     0.042    0.025    0.021     0.005       0.553
+maddpg  bias      0.90 worst1     0.535       0.036     0.019     0.052    0.024    0.021     0.010       0.571
+maddpg drift      0.01 worst1     0.951       0.014     0.008     0.019    0.012    0.011     0.002       0.411
+maddpg drift      0.02 worst1     0.919       0.011    -0.007     0.027    0.013    0.014     0.008       0.435
+maddpg drift      0.04 worst1     0.834       0.018    -0.000     0.033    0.015    0.016     0.008       0.464
+maddpg  gain      0.30    all     0.102      -0.000    -0.005     0.005    0.003    0.001    -0.000       0.975
+maddpg  gain      0.30 worst1     0.328      -0.002    -0.008     0.004   -0.000    0.003     0.000       0.977
+maddpg  gain      0.50    all     0.209       0.015     0.011     0.022    0.007    0.009     0.002       0.953
+maddpg  gain      0.50 worst1     0.413      -0.003    -0.013     0.008   -0.003    0.002    -0.000       0.953
+maddpg  gain      0.70    all     0.508      -0.008    -0.017     0.002   -0.008   -0.001     0.002       0.920
+maddpg  gain      0.70 worst1     0.627       0.005    -0.006     0.015    0.002   -0.001    -0.000       0.921
+maddpg stuck      1.00 worst1     0.274         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+maddpg  wdir      0.30   wdir     0.831       0.041     0.017     0.067    0.037    0.036     0.019       0.431
+ marta  bias      0.10    all     0.965         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.10 worst1     0.946         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.30    all     0.850         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.30 worst1     0.915         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.50    all     0.752         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.50 worst1     0.870         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.70    all     0.661         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.70 worst1     0.814         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.90    all     0.550         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  bias      0.90 worst1     0.770         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta drift      0.01 worst1     0.974         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta drift      0.02 worst1     0.954         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta drift      0.04 worst1     0.901         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.30    all     0.158         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.30 worst1     0.618         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.50    all     0.307         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.50 worst1     0.689         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.70    all     0.585         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  gain      0.70 worst1     0.824         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta stuck      1.00 worst1     0.539         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+ marta  wdir      0.30   wdir     0.870         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.10    all     0.931         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.10 worst1     0.952         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.30    all     0.845         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.30 worst1     0.876         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.50    all     0.693         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.50 worst1     0.778         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.70    all     0.537         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.70 worst1     0.677         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.90    all     0.417         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  bias      0.90 worst1     0.559         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr drift      0.01 worst1     0.969         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr drift      0.02 worst1     0.932         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr drift      0.04 worst1     0.832         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.30    all     0.130         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.30 worst1     0.304         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.50    all     0.286         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.50 worst1     0.451         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.70    all     0.612         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  gain      0.70 worst1     0.723         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr stuck      1.00 worst1     0.254         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    nr  wdir      0.30   wdir     0.814         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    pr  bias      0.10    all     0.944       0.016     0.008     0.024    0.010    0.015     0.008       0.416
+    pr  bias      0.10 worst1     0.961       0.015     0.003     0.034    0.010    0.007     0.000       0.412
+    pr  bias      0.30    all     0.836       0.019    -0.001     0.038    0.015    0.006     0.001       0.454
+    pr  bias      0.30 worst1     0.874       0.012     0.003     0.023    0.015    0.010     0.010       0.449
+    pr  bias      0.50    all     0.682       0.037     0.020     0.058    0.037    0.032     0.011       0.484
+    pr  bias      0.50 worst1     0.753       0.028     0.005     0.047    0.018    0.028     0.019       0.489
+    pr  bias      0.70    all     0.530       0.033     0.011     0.060    0.037    0.030     0.022       0.512
+    pr  bias      0.70 worst1     0.626       0.034     0.003     0.064    0.028    0.035     0.018       0.524
+    pr  bias      0.90    all     0.409       0.046     0.042     0.052    0.049    0.028     0.021       0.542
+    pr  bias      0.90 worst1     0.541       0.036     0.005     0.066    0.025    0.022     0.025       0.557
+    pr drift      0.01 worst1     0.978       0.002    -0.005     0.010    0.001   -0.002     0.003       0.408
+    pr drift      0.02 worst1     0.934       0.021     0.012     0.029    0.012    0.015     0.005       0.432
+    pr drift      0.04 worst1     0.800       0.030     0.005     0.054    0.030    0.025     0.012       0.465
+    pr  gain      0.30    all     0.113       0.004    -0.000     0.011    0.004    0.001    -0.002       0.976
+    pr  gain      0.30 worst1     0.303      -0.006    -0.017     0.009   -0.003   -0.006     0.001       0.975
+    pr  gain      0.50    all     0.249       0.008     0.001     0.018    0.004    0.008     0.002       0.955
+    pr  gain      0.50 worst1     0.408       0.007    -0.004     0.018    0.006    0.006     0.002       0.950
+    pr  gain      0.70    all     0.563       0.011     0.003     0.019    0.003    0.011     0.003       0.924
+    pr  gain      0.70 worst1     0.660      -0.002    -0.018     0.018    0.001   -0.001     0.000       0.915
+    pr stuck      1.00 worst1     0.230         NaN       NaN       NaN      NaN      NaN       NaN         NaN
+    pr  wdir      0.30   wdir     0.792       0.041     0.032     0.049    0.035    0.033     0.009       0.486
+
+STOP RULE (tag): max MADDPG exact-oracle gain on gain/bias cells = 0.036 (bias 0.9 worst1; threshold 0.05) -> STOP (tag arm)
