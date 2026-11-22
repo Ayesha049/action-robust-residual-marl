@@ -434,6 +434,115 @@ no errors. Clean J0 reproduces exactly (MADDPG tag 18.24, spread −11.12).
 - **Transport:** a lighter package and a longer horizon (proposed: mass 10, 300 steps). Re-pilot
   MAPPO there, with a gate relative to the scripted pusher's return.
 
+### Transport m10 re-pilot (setup fixed before the run, 2026-11-22)
+
+- **Task:** `transport_m10`, which is VMAS transport with package mass 10 and a fixed horizon of
+  300 steps. Otherwise as before (4 agents, u_multiplier 0.6).
+- **References** (100 clean episodes on the evaluation seeds, `eval_clean.py --policy`):
+  - Scripted walk-up pusher: return 46.9 (sd 34.1), delivered at some point in 43% of episodes,
+    on the goal at the end in 35%.
+  - Random team: 0.00.
+- **Gate:** a MAPPO configuration passes if its mean over the 3 tuning seeds has clean return
+  ≥ 46.9 **and** ever-delivered ≥ 0.43, which means at least matching the scripted pusher.
+  The configuration that passes with the highest return becomes the base for seeds 0-9.
+- **Pilot:** seeds 100-102 × {paper, fast, fast_ent (fast with entropy bonus 0.01)}, 24M frames
+  each, on lab server B (`TASK=transport_m10 CONFIGS="paper fast fast_ent"
+  phase2/mappo_pilot.sh`, output in `runs_phase2/mappo_m10/`).
+- The mass-50 paper-settings runs are left to finish, as a check of the MAPPO implementation
+  against the scripted 2.8 on the standard task.
+
+### Stage 1 development run 1 (launched 2026-11-22 00:28, lab server A)
+
+- **Trainer:** `phase2/train_fault.py`, which is Phase 1 Stage 1 with the NR channel replaced by
+  the fault channel. Every fault is affine per step, exe = clip(M_t cmd + b_t), so the channel
+  is differentiable and (M_t, b_t) is the critic's privileged context.
+- **Training mix (development default, untuned):**
+  - Clean with probability 0.25. Otherwise a rotation fault with weight 1/2 (θ ~ U[0, 180]°,
+    random sign), or gain, bias or drift with weight 1/6 each (g ~ U[0.3, 1], ‖b‖ ~ U[0, 0.9],
+    η ~ U[0, 0.04]).
+  - Victims: one random agent or all agents, 50/50. Onset U{0..12}.
+  - The stuck actuator stays out of training as the negative control.
+- **Hyperparameters:** Phase 1 values, untuned: 20k episodes, β 1, c_r 1, GRU 64.
+- **Runs:** tag and spread × MADDPG bases seeds 0-4 × {RC, RC-blind, REC, FT}, 40 runs.
+- **Evaluation:** every Stage 0 cell, including rot and bias up to 0.9, with no oracle. It uses
+  the Stage 0 seeds and RNG keys, so each cell pairs with the base's Stage 0 rows. 500 episodes
+  on tag, 100 on spread.
+- **Read-out (development; the confirmation tests are fixed later):** RC − MADDPG, RC − REC and
+  RC − RC-blind per cell, in absolute return, plus the clean cost.
+
+### Stage 1 development run 1: results (2026-11-22, 00:28-01:13 on server A)
+
+All 40 runs and 280 evaluation jobs completed with no errors. Summaries are in
+`runs_phase2/stage1/summary_*.txt` (`phase2/stage1_summary.py`, ρ on the base's scale).
+
+- **Tag: no method learned anything.** RC, REC, RC-blind and FT are all within about ±0.02 of
+  MADDPG on every rotation cell. For example, at 90° on all agents: MADDPG 0.089, RC 0.087, REC
+  0.089. Clean cost is nil.
+- **Spread: partial gains, but REC is ahead, and the evidence input is unused.**
+
+  | Cell | MADDPG | RC | REC | RC-blind | FT |
+  | --- | --- | --- | --- | --- | --- |
+  | rot 90°, all | 0.22 | 0.45 | 0.60 | 0.43 | 0.34 |
+  | rot 180°, all | −2.04 | −1.70 | −0.40 | −1.79 | −1.43 |
+  | rot 90°, worst single | 0.75 | 0.81 | 0.86 | 0.81 | 0.78 |
+  | bias 0.9, all | 0.875 | 0.80 | 0.68 | 0.81 | 0.84 |
+
+  - RC ≈ RC-blind, so the gain comes from the residual's state dependence, not from the
+    executed-action evidence.
+  - All trained methods lose 0.02-0.2 on large bias, a fault their training never made
+    worthwhile to fix.
+- **Diagnosis: the Phase 1 residual cannot express the correction.** The residual acts before the
+  squash, mu = tanh(u_b + g β tanh(D)) with β = 1, so per component |Δu| ≤ 1.
+  - Measured on clean states (5 seeds × 40 episodes): the tag base's pre-tanh outputs have a
+    median |u_b| of 5.9 (81% exceed 2).
+  - The share of oracle rotation commands reachable within the bound:
+
+    | θ | tag β 1 | tag β 3 | tag β 5 | spread β 1 | spread β 3 | spread β 5 |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | 30° | 0.04 | 0.17 | 0.31 | 0.67 | 0.87 | 0.91 |
+    | 90° | 0.01 | 0.05 | 0.11 | 0.48 | 0.77 | 0.85 |
+    | 180° | 0.00 | 0.02 | 0.06 | 0.39 | 0.72 | 0.79 |
+
+  - On a saturating base, a pre-tanh residual is pinned by the saturation itself: it would need
+    a huge Δu just to come off the flat part of tanh. This is a property of the
+    parameterisation, not of training. It probably also capped Phase 1 on spread.
+
+### Transport m10 gate pilot: results (finished 2026-11-22 05:35): PASS with `fast_ent`
+
+Files are in `results/transport_pilot/` (clean evaluations and the m10 training logs; MAPPO and
+MADDPG at mass 50 too).
+
+| Config (mean over tuning seeds 100-102) | Clean return | Ever delivered | On goal at end |
+| --- | --- | --- | --- |
+| scripted pusher (reference) | 46.9 | 0.43 | 0.35 |
+| random | 0.00 | 0.00 | 0.00 |
+| paper (lr 5e-5, 45 epochs) | 10.0 | 0.09 | 0.09 |
+| fast (lr 3e-4, 10 epochs) | 6.5 | 0.05 | 0.04 |
+| **fast_ent** (fast + entropy 0.01) | **80.8** | **0.85** | **0.85** |
+
+- **fast_ent passes on every seed** (80.7 / 80.8 / 80.9; 0.85-0.86 delivered), and it is the
+  only configuration that does. Without the entropy bonus, the policy std collapses to about
+  0.2 and the team settles on a weak solution.
+- **Mass 50, for the record:** MAPPO paper and fast reach 0.24-0.59 at 24M (scripted 2.8).
+  MADDPG at 3M reaches 0.00-0.14. Nobody delivers.
+- **Next, by the pre-set rule:** fast_ent is the base configuration. The 10 MAPPO bases (seeds
+  0-9, 24M frames) were launched on lab server B at 18:51 (`phase2/mappo_bases.sh`, output in
+  `runs_phase2/mappo_bases/`).
+
+### Stage 1 development run 2: action-space residual (decided by the user 2026-11-22)
+
+- **Change (the only one from run 1):** the RC and REC head moves to action space,
+  mu = clip(mu_b + g β · 2 · tanh(D), −1, 1), where β is the warm-up ramp (0 → 1) and 2 is the
+  bound (`--space action --res-scale 2`, now the default in `phase2/train_fault.py`).
+  - Zero-initialised D, the gate, the frozen base and the inputs are unchanged. RC-blind uses
+    the same head, and FT is unaffected.
+  - Unit check: on a base saturated at +1, the pre-tanh head cannot move the action at all,
+    while the action-space head reaches −1. Both equal the base exactly at initialisation.
+- **This departs from the Phase 1 parameterisation** and is reported as such. Phase 1 results
+  used the pre-tanh head.
+- **Runs and evaluation:** as in run 1 (tag and spread, seeds 0-4, 4 kinds, every Stage 0
+  cell), output in `runs_phase2/stage1_run2/`.
+
 ### Stage 3: VMAS Transport (about 2 weeks)
 
 - **Port:** move the Phase 0 MADDPG code to VMAS Transport (roughly 3-5 days). Check the port on
